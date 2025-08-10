@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Xobe Color Palette Generator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      color: #fff;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.4);
+      transform: scale(1.05);
+    }
+
+    #palette {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 15px;
+    }
+
+    .color-box {
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      position: relative;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .color-box:hover {
+      transform: scale(1.05);
+    }
+
+    .color-box .hex {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .color-box .hex:hover {
+      background: rgba(0, 0, 0, 0.8);
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      #palette {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Xobe Color Palette Generator</h1>
+    <button onclick="generatePalette()">Generate 110 Colors</button>
+  </header>
+
+  <div id="palette"></div>
+
+  <script>
+    const paletteContainer = document.getElementById('palette');
+    const savedPalette = JSON.parse(localStorage.getItem('xobePalette')) || [];
+
+    function generateColor() {
+      const letters = '0123456789ABCDEF';
+      let color = '#';
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+
+    function createColorBox(hex) {
+      const box = document.createElement('div');
+      box.className = 'color-box';
+      box.style.backgroundColor = hex;
+
+      const label = document.createElement('div');
+      label.className = 'hex';
+      label.textContent = hex;
+      label.onclick = () => {
+        navigator.clipboard.writeText(hex);
+        label.textContent = 'Copied!';
+        setTimeout(() => (label.textContent = hex), 1000);
+      };
+
+      box.appendChild(label);
+      return box;
+    }
+
+    function generatePalette() {
+      paletteContainer.innerHTML = '';
+      const newPalette = [];
+      for (let i = 0; i < 110; i++) {
+        const color = generateColor();
+        newPalette.push(color);
+        paletteContainer.appendChild(createColorBox(color));
+      }
+      localStorage.setItem('xobePalette', JSON.stringify(newPalette));
+    }
+
+    function loadSavedPalette() {
+      savedPalette.forEach(hex => {
+        paletteContainer.appendChild(createColorBox(hex));
+      });
+    }
+
+    loadSavedPalette();
+  </script>
+</body>
+</html>
